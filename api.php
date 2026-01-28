@@ -68,11 +68,12 @@ function saveBill($conn, $data) {
         foreach ($items as $item) {
             $item_name = $conn->real_escape_string($item['name']);
             $quantity = $item['qty'];
+            $unit = $conn->real_escape_string($item['unit']);
             $price = $item['price'];
             $total = $item['total'];
             
-            $conn->query("INSERT INTO bill_items (bill_id, item_name, quantity, price, total) 
-                         VALUES ($bill_id, '$item_name', $quantity, $price, $total)");
+            $conn->query("INSERT INTO bill_items (bill_id, item_name, quantity, unit, price, total) 
+                         VALUES ($bill_id, '$item_name', $quantity, '$unit', $price, $total)");
         }
         
         echo json_encode(['success' => true, 'message' => 'Bill saved successfully!', 'bill_id' => $bill_id]);
