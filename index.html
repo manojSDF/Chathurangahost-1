@@ -424,15 +424,15 @@
                     <div class="combo-box-container">
                         <input type="text" id="itemName" class="combo-box-input" placeholder="Type to search or click...">
                         <div id="itemDropdown" class="combo-box-dropdown">
-                            <div class="combo-box-option" data-value="සීනි">සීනි</div>
-                            <div class="combo-box-option" data-value="අල">අල</div>
-                            <div class="combo-box-option" data-value="පාන් පිටි">පාන් පිටි</div>
-                            <div class="combo-box-option" data-value="පරිප්පු">පරිප්පු</div>
-                            <div class="combo-box-option" data-value="කරුංගා පුවක්">කරුංගා පුවක්</div>
-                            <div class="combo-box-option" data-value="සන්ලයිට්">සන්ලයිට්</div>
-                            <div class="combo-box-option" data-value="ඉදි අප්ප පිටි">ඉදි අප්ප පිටි</div>
-                            <div class="combo-box-option" data-value="හාල් මැස්සන්">හාල් මැස්සන්</div>
-                            <div class="combo-box-option" data-value="මුරුක්කු පැකට්">මුරුක්කු පැකට්</div>
+                            <div class="combo-box-option" data-value="Sugar">Sugar</div>
+                            <div class="combo-box-option" data-value="Cricket ball">Cricket ball</div>
+                            <div class="combo-box-option" data-value="Petrol">Petrol</div>
+                            <div class="combo-box-option" data-value="Diesel">Diesel</div>
+                            <div class="combo-box-option" data-value="Oil">Oil</div>
+                            <div class="combo-box-option" data-value="Soap">Soap</div>
+                            <div class="combo-box-option" data-value="Tourch">Tourch</div>
+                            <div class="combo-box-option" data-value="Lighter">Lighter</div>
+                            <div class="combo-box-option" data-value="Mrukku Paket">Mrukku Paket</div>
                             <div class="combo-box-option" data-value="Murukku">Murukku</div>
                         </div>
                     </div>
@@ -441,6 +441,20 @@
                 <div class="form-group">
                     <label for="itemQty">Quantity</label>
                     <input type="number" id="itemQty" placeholder="Enter quantity" min="1" value="1">
+                </div>
+
+                <div class="form-group">
+                    <label for="itemUnit">Unit</label>
+                    <select id="itemUnit">
+                        <option value="pcs">Pieces (pcs)</option>
+                        <option value="kg">Kilogram (kg)</option>
+                        <option value="L">Litre (L)</option>
+                        <option value="ml">Millilitre (ml)</option>
+                        <option value="cm">Centimetre (cm)</option>
+                        <option value="m">Meter (m)</option>
+                        <option value="box">Box</option>
+                        <option value="pack">Pack</option>
+                    </select>
                 </div>
 
                 <div class="form-group">
@@ -572,6 +586,7 @@
         function addItem() {
             const itemName = document.getElementById('itemName').value.trim();
             const itemQty = parseFloat(document.getElementById('itemQty').value);
+            const itemUnit = document.getElementById('itemUnit').value;
             const itemPrice = parseFloat(document.getElementById('itemPrice').value);
 
             if (!itemName || !itemQty || !itemPrice) {
@@ -583,6 +598,7 @@
                 id: Date.now(),
                 name: itemName,
                 qty: itemQty,
+                unit: itemUnit,
                 price: itemPrice,
                 total: itemQty * itemPrice
             });
@@ -590,6 +606,7 @@
             // Clear input fields
             document.getElementById('itemName').value = '';
             document.getElementById('itemQty').value = '1';
+            document.getElementById('itemUnit').value = 'pcs';
             document.getElementById('itemPrice').value = '';
             document.getElementById('itemName').focus();
 
@@ -610,12 +627,13 @@
                 return;
             }
 
-            let html = '<table class="invoice-table"><thead><tr><th>Item</th><th>Qty</th><th>Price</th><th>Total</th><th>Action</th></tr></thead><tbody>';
+            let html = '<table class="invoice-table"><thead><tr><th>Item</th><th>Qty</th><th>Unit</th><th>Price</th><th>Total</th><th>Action</th></tr></thead><tbody>';
             
             items.forEach(item => {
                 html += `<tr>
                     <td>${item.name}</td>
                     <td>${item.qty}</td>
+                    <td>${item.unit}</td>
                     <td>Rs ${item.price.toFixed(2)}</td>
                     <td>Rs ${item.total.toFixed(2)}</td>
                     <td><button class="delete-btn" onclick="deleteItem(${item.id})">Delete</button></td>
@@ -653,6 +671,7 @@
                 document.getElementById('customerPhone').value = '';
                 document.getElementById('itemName').value = '';
                 document.getElementById('itemQty').value = '1';
+                document.getElementById('itemUnit').value = 'pcs';
                 document.getElementById('itemPrice').value = '';
                 document.getElementById('taxPercent').value = '0';
                 renderBill();
@@ -844,4 +863,3 @@
     </div>
 </body>
 </html>
-
