@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Manoj Stores- Invoice Management</title>
+    <style>
+        * {
+            margin:0;
+            padding:0;
+            box-sizing: border-box;
+        }
+
+        body 
+        {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container 
+        {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header 
+        {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 
+        {
+            font-size: 2.5em;
+            margin-bottom: 5px;
+        }
+
+        .content 
+        {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        
+        @media (max-width: 900px) 
+        {
+            .content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-section 
+        {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group 
+        {
+            margin-bottom: 15px;
+        }
+
+        label 
+        {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        input, select 
+        {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus 
+        {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+        }
+
+        button 
+        {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: transform 0.2s;
+            font-weight: 600;
+        }
+
+        button:hover 
+        {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .invoice-section 
+        {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .invoice-table 
+        {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .invoice-table th 
+        {
+            background: #f5f5f5;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .invoice-table td 
+        {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .invoice-table tr:hover 
+        {
+            background: #f9f9f9;
+        }
+
+        .delete-btn 
+        {
+            background: #e74c3c;
+            padding: 5px 10px;
+            font-size: 0.9em;
+            margin: 0;
+        }
+
+        .delete-btn:hover 
+        {
+            background: #c0392b;
+        }
+
+        .totals 
+        {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .total-row 
+        {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .total-row.grand-total 
+        {
+            border-top: 2px solid #667eea;
+            padding-top: 10px;
+            font-weight: 700;
+            font-size: 1.3em;
+            color: #667eea;
+        }
+
+        .action-buttons 
+        {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .print-btn 
+        {
+            background: #27ae60;
+        }
+
+        .print-btn:hover 
+        {
+            background: #229954;
+        }
+
+        .reset-btn 
+        {
+            background: #95a5a6;
+        }
+
+        .reset-btn:hover 
+        {
+            background: #7f8c8d;
+        }
+
+        .save-btn 
+        {
+            background: #3498db;
+            grid-column: span 1;
+        }
+
+        .save-btn:hover 
+        {
+            background: #2980b9;
+        }
+
+        .view-btn 
+        {
+            background: #e67e22;
+            grid-column: span 1;
+        }
+
+        .view-btn:hover 
+        {
+            background: #d35400;
+        }
+
+        /* Modal Styles */
+        .modal 
+        {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content 
+        {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 900px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .close-modal 
+        {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close-modal:hover {
+            color: #000;
+        }
+
+        .bills-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .bills-table th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .bills-table td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .bills-table tr:hover {
+            background: #f5f5f5;
+        }
+
+        .view-details-btn {
+            background: #3498db;
+            padding: 8px 12px;
+            font-size: 0.9em;
+            margin: 0;
+        }
+
+        .view-details-btn:hover {
+            background: #2980b9;
+        }
+
+        .empty-message {
+            text-align: center;
+            color: #999;
+            padding: 30px;
+            font-style: italic;
+        }
+
+        .combo-box-container {
+            position: relative;
+            margin-bottom: 15px;
+            margin-top: -10px;
+        }
+
+        .combo-box-input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        .combo-box-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+        }
+
+        .combo-box-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 2px solid #667eea;
+            border-top: none;
+            border-radius: 0 0 5px 5px;
+            max-height: 200px;
+            overflow-y: auto;
+            display: none;
+            z-index: 100;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+        }
+
+        .combo-box-dropdown.show {
+            display: block;
+        }
+
+        .combo-box-option {
+            padding: 10px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+        }
+
+        .combo-box-option:hover,
+        .combo-box-option.selected {
+            background: #667eea;
+            color: white;
+        }
+
+        .empty-option {
+            padding: 10px;
+            text-align: center;
+            color: #999;
+        }
+
+        .customer-info {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+            .form-section, .action-buttons {
+                display: none;
+            }
+            .container {
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💳 Manoj Strores [Thimbiriyawa]</h1>
+            <p>Easy Invoice & Billing</p>
+        </div>
+
+        <div class="content">
+            <!-- Left Side - Form -->
+            <div class="form-section">
+                <h2 class="section-title">Customer & Item Details</h2>
+                
+                <div class="customer-info">
+                    <div class="form-group">
+                        <label for="customerName">Customer Name</label>
+                        <input type="text" id="customerName" placeholder="Enter customer name">
+                    </div>
+                    <div class="form-group">
+                        <label for="customerPhone">Phone Number</label>
+                        <input type="text" id="customerPhone" placeholder="Enter phone number">
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 20px; margin-bottom: 15px; color: #333;">Add Items</h3>
+
+                <div class="form-group">
+                    <label for="itemName">Product/Item Name</label>
+                    <div class="combo-box-container">
+                        <input type="text" id="itemName" class="combo-box-input" placeholder="Type to search or click...">
+                        <div id="itemDropdown" class="combo-box-dropdown">
+                            <div class="combo-box-option" data-value="Sugar">Sugar</div>
+                            <div class="combo-box-option" data-value="Cricket ball">Cricket ball</div>
+                            <div class="combo-box-option" data-value="Petrol">Petrol</div>
+                            <div class="combo-box-option" data-value="Diesel">Diesel</div>
+                            <div class="combo-box-option" data-value="Oil">Oil</div>
+                            <div class="combo-box-option" data-value="Soap">Soap</div>
+                            <div class="combo-box-option" data-value="Tourch">Tourch</div>
+                            <div class="combo-box-option" data-value="Lighter">Lighter</div>
+                            <div class="combo-box-option" data-value="Mrukku Paket">Mrukku Paket</div>
+                            <div class="combo-box-option" data-value="Murukku">Murukku</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="itemQty">Quantity</label>
+                    <input type="number" id="itemQty" placeholder="Enter quantity" min="1" value="1">
+                </div>
+
+                <div class="form-group">
+                    <label for="itemPrice">Price per Unit</label>
+                    <input type="number" id="itemPrice" placeholder="Enter price" min="0" step="0.01">
+                </div>
+
+                <button onclick="addItem()">Add Item to Bill</button>
+            </div>
+
+            <!-- Right Side - Invoice -->
+            <div class="invoice-section">
+                <h2 class="section-title">Invoice</h2>
+
+                <div style="background: #f9f9f9; padding: 10px; border-radius: 5px; margin-bottom: 15px;">
+                    <strong>Date:</strong> <span id="invoiceDate"></span>
+                </div>
+
+                <div id="billItems">
+                    <div class="empty-message">No items added yet. Add items from the left side.</div>
+                </div>
+
+                <div class="totals">
+                    <div class="total-row">
+                        <span>Subtotal:</span>
+                        <span id="subtotal">Rs 0.00</span>
+                    </div>
+                    <div class="total-row">
+                        <label for="taxPercent">Tax (%):</label>
+                        <input type="number" id="taxPercent" value="0" min="0" step="0.01" style="width: 80px; padding: 5px;" onchange="calculateTotal()">
+                    </div>
+                    <div class="total-row">
+                        <span>Tax Amount:</span>
+                        <span id="taxAmount">Rs 0.00</span>
+                    </div>
+                    <div class="total-row grand-total">
+                        <span>Total Amount:</span>
+                        <span id="grandTotal">Rs 0.00</span>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="save-btn" onclick="saveBill()">💾 Save Bill</button>
+                    <button class="print-btn" onclick="printBill()">🖨️ Print Bill</button>
+                    <button class="reset-btn" onclick="resetBill()">🔄 Reset</button>
+                    <button class="view-btn" onclick="viewBills()">📋 View Saved Bills</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let items = [];
+
+        // Set current date on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            const today = new Date();
+            const dateStr = today.toLocaleDateString('en-IN', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            document.getElementById('invoiceDate').textContent = dateStr;
+        });
+        
+        // Combo Box Functionality
+        const itemInput = document.getElementById('itemName');
+        const itemDropdown = document.getElementById('itemDropdown');
+        const options = itemDropdown.querySelectorAll('.combo-box-option');
+        
+        // Show dropdown on input focus
+        itemInput.addEventListener('focus', function() {
+            itemDropdown.classList.add('show');
+            filterOptions();
+        });
+        
+        // Filter options as user types
+        itemInput.addEventListener('input', function() {
+            filterOptions();
+            itemDropdown.classList.add('show');
+        });
+        
+        // Filter function
+        function filterOptions() {
+            const searchValue = itemInput.value.toLowerCase();
+            let hasVisibleOptions = false;
+            
+            options.forEach(option => {
+                const optionText = option.getAttribute('data-value').toLowerCase();
+                if (optionText.includes(searchValue) || searchValue === '') {
+                    option.style.display = 'block';
+                    hasVisibleOptions = true;
+                } else {
+                    option.style.display = 'none';
+                }
+            });
+            
+            if (!hasVisibleOptions) {
+                itemDropdown.innerHTML = '<div class="empty-option">No products found</div>';
+            }
+        }
+        
+        // Select option on click
+        options.forEach(option => {
+            option.addEventListener('click', function() {
+                const value = this.getAttribute('data-value');
+                itemInput.value = value;
+                itemDropdown.classList.remove('show');
+                filterOptions();
+                document.getElementById('itemQty').focus();
+            });
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            if (event.target !== itemInput && event.target !== itemDropdown) {
+                itemDropdown.classList.remove('show');
+            }
+        });
+        
+        // Show all options on click
+        itemInput.addEventListener('click', function(e) {
+            e.stopPropagation();
+            itemInput.value = '';
+            filterOptions();
+            itemDropdown.classList.add('show');
+        });
+
+        function addItem() {
+            const itemName = document.getElementById('itemName').value.trim();
+            const itemQty = parseFloat(document.getElementById('itemQty').value);
+            const itemPrice = parseFloat(document.getElementById('itemPrice').value);
+
+            if (!itemName || !itemQty || !itemPrice) {
+                alert('Please fill in all item details');
+                return;
+            }
+
+            items.push({
+                id: Date.now(),
+                name: itemName,
+                qty: itemQty,
+                price: itemPrice,
+                total: itemQty * itemPrice
+            });
+
+            // Clear input fields
+            document.getElementById('itemName').value = '';
+            document.getElementById('itemQty').value = '1';
+            document.getElementById('itemPrice').value = '';
+            document.getElementById('itemName').focus();
+
+            renderBill();
+        }
+
+        function deleteItem(id) {
+            items = items.filter(item => item.id !== id);
+            renderBill();
+        }
+
+        function renderBill() {
+            const billItems = document.getElementById('billItems');
+            
+            if (items.length === 0) {
+                billItems.innerHTML = '<div class="empty-message">No items added yet. Add items from the left side.</div>';
+                calculateTotal();
+                return;
+            }
+
+            let html = '<table class="invoice-table"><thead><tr><th>Item</th><th>Qty</th><th>Price</th><th>Total</th><th>Action</th></tr></thead><tbody>';
+            
+            items.forEach(item => {
+                html += `<tr>
+                    <td>${item.name}</td>
+                    <td>${item.qty}</td>
+                    <td>Rs ${item.price.toFixed(2)}</td>
+                    <td>Rs ${item.total.toFixed(2)}</td>
+                    <td><button class="delete-btn" onclick="deleteItem(${item.id})">Delete</button></td>
+                </tr>`;
+            });
+
+            html += '</tbody></table>';
+            billItems.innerHTML = html;
+            calculateTotal();
+        }
+
+        function calculateTotal() {
+            const subtotal = items.reduce((sum, item) => sum + item.total, 0);
+            const taxPercent = parseFloat(document.getElementById('taxPercent').value) || 0;
+            const taxAmount = (subtotal * taxPercent) / 100;
+            const grandTotal = subtotal + taxAmount;
+
+            document.getElementById('subtotal').textContent = 'Rs ' + subtotal.toFixed(2);
+            document.getElementById('taxAmount').textContent = 'Rs ' + taxAmount.toFixed(2);
+            document.getElementById('grandTotal').textContent = 'Rs ' + grandTotal.toFixed(2);
+        }
+
+        function printBill() {
+            if (items.length === 0) {
+                alert('Please add items before printing');
+                return;
+            }
+            window.print();
+        }
+
+        function resetBill() {
+            if (confirm('Are you sure you want to reset the entire bill?')) {
+                items = [];
+                document.getElementById('customerName').value = '';
+                document.getElementById('customerPhone').value = '';
+                document.getElementById('itemName').value = '';
+                document.getElementById('itemQty').value = '1';
+                document.getElementById('itemPrice').value = '';
+                document.getElementById('taxPercent').value = '0';
+                renderBill();
+            }
+        }
+
+        // Allow Enter key to add item
+        document.getElementById('itemPrice').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') addItem();
+        });
+
+        // Save bill to database
+        function saveBill() {
+            const customerName = document.getElementById('customerName').value.trim();
+            
+            if (!customerName) {
+                alert('Please enter customer name before saving');
+                return;
+            }
+            
+            if (items.length === 0) {
+                alert('Please add items before saving');
+                return;
+            }
+            
+            const billData = {
+                customerName: customerName,
+                customerPhone: document.getElementById('customerPhone').value.trim(),
+                items: items,
+                subtotal: items.reduce((sum, item) => sum + item.total, 0),
+                taxPercent: parseFloat(document.getElementById('taxPercent').value) || 0,
+                taxAmount: parseFloat(document.getElementById('taxAmount').textContent.replace('Rs ', '')),
+                grandTotal: parseFloat(document.getElementById('grandTotal').textContent.replace('Rs ', ''))
+            };
+            
+            fetch('api.php?action=saveBill', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(billData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('✓ Bill saved successfully! Bill ID: ' + data.bill_id);
+                    resetBill();
+                } else {
+                    alert('✗ Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error saving bill. Make sure the database is configured.');
+            });
+        }
+
+        // View saved bills
+        function viewBills() {
+            fetch('api.php?action=getBills')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showBillsModal(data.bills);
+                } else {
+                    alert('Error loading bills');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error loading bills. Make sure the database is configured.');
+            });
+        }
+
+        // Show bills in modal
+        function showBillsModal(bills) {
+            let html = '<h2>Saved Bills</h2>';
+            
+            if (bills.length === 0) {
+                html += '<p>No saved bills found.</p>';
+            } else {
+                html += '<table class="bills-table"><thead><tr><th>Bill ID</th><th>Customer</th><th>Phone</th><th>Total (Rs)</th><th>Date</th><th>Time</th><th>Action</th></tr></thead><tbody>';
+                
+                bills.forEach(bill => {
+                    const dateTime = new Date(bill.created_at);
+                    const date = dateTime.toLocaleDateString('en-IN');
+                    const time = dateTime.toLocaleTimeString('en-IN');
+                    html += `<tr>
+                        <td>#${bill.id}</td>
+                        <td>${bill.name}</td>
+                        <td>${bill.phone}</td>
+                        <td>${parseFloat(bill.grand_total).toFixed(2)}</td>
+                        <td>${date}</td>
+                        <td>${time}</td>
+                        <td><button class="view-details-btn" onclick="loadBillDetails(${bill.id})">View</button></td>
+                    </tr>`;
+                });
+                
+                html += '</tbody></table>';
+            }
+            
+            document.getElementById('billsModalContent').innerHTML = html;
+            document.getElementById('billsModal').style.display = 'block';
+        }
+
+        // Load and display bill details
+        function loadBillDetails(billId) {
+            fetch('api.php?action=getBillDetails&bill_id=' + billId)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showBillDetailsModal(data.bill);
+                } else {
+                    alert('Error loading bill details');
+                }
+            });
+        }
+
+        // Show bill details in modal
+        function showBillDetailsModal(bill) {
+            let html = `<h2>Bill Details - #${bill.id}</h2>`;
+            html += `<p><strong>Customer:</strong> ${bill.name} | <strong>Phone:</strong> ${bill.phone}</p>`;
+            html += `<p><strong>Date:</strong> ${new Date(bill.created_at).toLocaleDateString('en-IN')}</p>`;
+            
+            html += '<table class="invoice-table"><thead><tr><th>Item</th><th>Qty</th><th>Price</th><th>Total</th></tr></thead><tbody>';
+            
+            bill.items.forEach(item => {
+                html += `<tr>
+                    <td>${item.item_name}</td>
+                    <td>${item.quantity}</td>
+                    <td>Rs ${parseFloat(item.price).toFixed(2)}</td>
+                    <td>Rs ${parseFloat(item.total).toFixed(2)}</td>
+                </tr>`;
+            });
+            
+            html += '</tbody></table>';
+            html += `<div class="totals" style="margin-top: 20px;">
+                <div class="total-row">
+                    <span>Subtotal:</span>
+                    <span>Rs ${parseFloat(bill.subtotal).toFixed(2)}</span>
+                </div>
+                <div class="total-row">
+                    <span>Tax (${bill.tax_percent}%):</span>
+                    <span>Rs ${parseFloat(bill.tax_amount).toFixed(2)}</span>
+                </div>
+                <div class="total-row grand-total">
+                    <span>Total Amount:</span>
+                    <span>Rs ${parseFloat(bill.grand_total).toFixed(2)}</span>
+                </div>
+            </div>`;
+            
+            document.getElementById('detailsModalContent').innerHTML = html;
+            document.getElementById('detailsModal').style.display = 'block';
+        }
+
+        // Close modals
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            let billsModal = document.getElementById('billsModal');
+            let detailsModal = document.getElementById('detailsModal');
+            
+            if (event.target === billsModal) {
+                billsModal.style.display = 'none';
+            }
+            if (event.target === detailsModal) {
+                detailsModal.style.display = 'none';
+            }
+        }
+    </script>
+
+    <!-- Bills Modal -->
+    <div id="billsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('billsModal')">&times;</span>
+            <div id="billsModalContent"></div>
+        </div>
+    </div>
+
+    <!-- Bill Details Modal -->
+    <div id="detailsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('detailsModal')">&times;</span>
+            <div id="detailsModalContent"></div>
+        </div>
+    </div>
+</body>
+</html>
